@@ -166,9 +166,17 @@ class PHPUnit_Extensions_Database_DataSet_AbstractTable implements PHPUnit_Exten
             foreach ($columns as $columnName) {
                 $thisValue = $this->getValue($i, $columnName);
                 $otherValue = $other->getValue($i, $columnName);
+
                 if (is_numeric($thisValue) && is_numeric($otherValue)) {
                     if ($thisValue != $otherValue) {
                         $this->other = $other;
+                        return FALSE;
+                    }
+                } elseif ((filter_var($thisValue, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null) &&
+                          (filter_var($otherValue, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)) !== null) {
+                    $otherBool = filter_var($otherValue, FILTER_VALIDATE_BOOLEAN);
+                    $thisBool = filter_var($thisValue, FILTER_VALIDATE_BOOLEAN);
+                    if ($thisBool !== $otherBool) {
                         return FALSE;
                     }
                 } elseif ($thisValue !== $otherValue) {
